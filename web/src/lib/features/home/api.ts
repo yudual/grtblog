@@ -41,7 +41,7 @@ export const getHomeActivityPulse = async (
 	});
 	const result = await api<HomeActivityPulseData>(
 		`/public/home/activity-pulse?${query.toString()}`
-	);
+	).catch(() => null);
 	const fallbackDays =
 		options.days === 'all' ? 0 : options.days && options.days > 0 ? Math.floor(options.days) : 365;
 	return (
@@ -51,7 +51,7 @@ export const getHomeActivityPulse = async (
 			endDate: '',
 			totalPosts: 0,
 			totalMoments: 0,
-			statusLabel: 'Quiet',
+			statusLabel: '暂时安静',
 			points: []
 		}
 	);
@@ -70,7 +70,9 @@ export const getHomeInspirationStats = async (
 		}
 	}
 	const suffix = query.size > 0 ? `?${query.toString()}` : '';
-	const result = await api<HomeInspirationStatsData>(`/public/home/inspiration-stats${suffix}`);
+	const result = await api<HomeInspirationStatsData>(
+		`/public/home/inspiration-stats${suffix}`
+	).catch(() => null);
 	return (
 		result ?? {
 			words: {

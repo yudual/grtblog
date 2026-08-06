@@ -7,7 +7,7 @@ export type CreateCommentLoginPayload = {
 export type CreateCommentVisitorPayload = {
 	content: string;
 	nickName: string;
-	email: string;
+	email?: string | null;
 	website?: string | null;
 	parentId?: number | null;
 	visitorId?: string;

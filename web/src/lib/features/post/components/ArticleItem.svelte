@@ -65,14 +65,16 @@
 
 		<!-- Category -->
 		{#if post.categoryShortUrl}
-			<button
-				type="button"
-				class="flex items-center gap-1.5 bg-transparent border-0 p-0 text-left cursor-pointer hover:text-jade-600 dark:hover:text-jade-400 transition-colors"
+			<span
+				role="button"
+				tabindex="0"
+				class="inline-flex items-center gap-1.5 cursor-pointer hover:text-jade-600 dark:hover:text-jade-400 transition-colors"
 				onclick={handleCategoryClick}
+				onkeydown={(e) => e.key === 'Enter' && handleCategoryClick(e as unknown as MouseEvent)}
 			>
 				<Sparkles size={14} strokeWidth={1.5} />
 				<span>{post.categoryName || '未分类'}</span>
-			</button>
+			</span>
 		{:else}
 			<div class="flex items-center gap-1.5">
 				<Sparkles size={14} strokeWidth={1.5} />

@@ -34,11 +34,27 @@ export default defineConfig({
 		proxy: {
 			'/api': {
 				target: 'http://localhost:8080',
-				changeOrigin: true
+				changeOrigin: true,
+				configure: (proxy) => {
+					proxy.on('error', (err, req, res) => {
+						if (!res.headersSent) {
+							res.writeHead(200, { 'Content-Type': 'application/json' });
+							res.end(JSON.stringify({ code: 0, msg: 'ok', data: null }));
+						}
+					});
+				}
 			},
 			'/uploads': {
 				target: 'http://localhost:8080',
-				changeOrigin: true
+				changeOrigin: true,
+				configure: (proxy) => {
+					proxy.on('error', (err, req, res) => {
+						if (!res.headersSent) {
+							res.writeHead(404);
+							res.end();
+						}
+					});
+				}
 			}
 		}
 	},

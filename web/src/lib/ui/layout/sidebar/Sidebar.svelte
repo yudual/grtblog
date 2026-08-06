@@ -9,7 +9,6 @@
 	import { SearchIcon } from 'lucide-svelte';
 
 	import Button from '$lib/ui/primitives/button/Button.svelte';
-	import VisitorAvatar from '$lib/ui/layout/sidebar/VisitorAvatar.svelte';
 	import { uiState } from '$lib/shared/stores/ui.svelte';
 	import { windowStore } from '$lib/shared/stores/windowStore.svelte';
 	import { LayoutIcon } from 'lucide-svelte';
@@ -60,14 +59,20 @@
 				<a
 					href={/^(https?:|\/\/)/i.test(item.url) ? item.url : resolveHref(item.url)}
 					aria-label={item.name}
-					class="relative z-20 flex h-10 w-10 items-center justify-center rounded-default transition-all duration-200
+					title={item.name}
+					class="relative z-20 flex flex-col h-12 w-14 items-center justify-center rounded-xl transition-all duration-200 gap-0.5 group
                     {active
-						? 'bg-ink-900 text-white shadow-sm dark:bg-ink-100 dark:text-ink-950'
-						: 'hover:bg-ink-200 hover:text-ink-900 dark:hover:bg-ink-800 dark:hover:text-ink-100'}"
+						? 'bg-ink-900 text-white shadow-md dark:bg-ink-100 dark:text-ink-950 scale-105'
+						: 'hover:bg-ink-200/70 hover:text-ink-900 dark:hover:bg-ink-800 dark:hover:text-ink-100'}"
 				>
-					{#if item.icon}
-						<DynamicLucideIcon name={item.icon} className="w-5 h-5" />
-					{/if}
+					<DynamicLucideIcon
+						name={item.icon || 'house'}
+						className="w-5 h-5 transition-transform duration-200 group-hover:scale-110"
+					/>
+					<span
+						class="text-[10px] font-medium leading-none tracking-wider opacity-80 group-hover:opacity-100"
+						>{item.name}</span
+					>
 				</a>
 
 				{#if isHovered}
@@ -146,7 +151,6 @@
 			<SearchIcon class="h-5 w-5" />
 		</button>
 		<ThemeIcon />
-		<VisitorAvatar />
 	</div>
 </aside>
 

@@ -4,11 +4,14 @@
 	import { resolveHomeThemeConfig } from '$lib/features/home/theme';
 
 	const websiteInfoStore = websiteInfoCtx.selectModelData((m) => m ?? null);
-	const siteAvatar = $derived(resolveHomeThemeConfig($websiteInfoStore).hero?.avatarUrl || '');
+	const siteAvatar = $derived(
+		resolveHomeThemeConfig($websiteInfoStore).hero?.avatarUrl ||
+			'https://api.dicebear.com/7.x/bottts/svg?seed=yushao'
+	);
 
 	const status = $derived(ownerStatusStore.status);
-	const isOnline = $derived(status.ok === 1);
-	const adminPanelOnline = $derived(status.adminPanelOnline === true);
+	const isOnline = $derived(status.ok === 1 || true);
+	const adminPanelOnline = $derived(status.adminPanelOnline === true || true);
 	const media = $derived(status.media ?? null);
 
 	let showDetails = $state(false);

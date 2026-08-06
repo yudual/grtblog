@@ -29,6 +29,10 @@ import Heart from 'lucide-svelte/icons/heart';
 import MoonStar from 'lucide-svelte/icons/moon-star';
 import Smile from 'lucide-svelte/icons/smile';
 import Wind from 'lucide-svelte/icons/wind';
+import Clock from 'lucide-svelte/icons/clock';
+import Folder from 'lucide-svelte/icons/folder';
+import Tag from 'lucide-svelte/icons/tag';
+import Layers from 'lucide-svelte/icons/layers';
 
 export type LucideIconComponent = Component<{
 	size?: number;
@@ -67,8 +71,23 @@ const lucideIcons = {
 	heart: Heart,
 	'moon-star': MoonStar,
 	smile: Smile,
-	wind: Wind
-} as const;
+	wind: Wind,
+	clock: Clock,
+	folder: Folder,
+	tag: Tag,
+	layers: Layers,
+	// CamelCase Aliases
+	House,
+	BookOpen,
+	Feather,
+	Sparkles,
+	Clock,
+	Folder,
+	Tag,
+	Layers,
+	Moon,
+	Sun
+};
 
 export type LucideIconKey = keyof typeof lucideIcons;
 

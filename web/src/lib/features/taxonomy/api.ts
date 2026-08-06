@@ -3,12 +3,12 @@ import type { Category, Column } from './types';
 
 export const getCategories = async (fetcher?: typeof fetch): Promise<Category[]> => {
 	const api = getApi(fetcher);
-	const result = await api<Category[]>('/categories');
+	const result = await api<Category[]>('/categories').catch(() => null);
 	return result ?? [];
 };
 
 export const getColumns = async (fetcher?: typeof fetch): Promise<Column[]> => {
 	const api = getApi(fetcher);
-	const result = await api<Column[]>('/columns');
+	const result = await api<Column[]>('/columns').catch(() => null);
 	return result ?? [];
 };

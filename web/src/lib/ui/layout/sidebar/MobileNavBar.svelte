@@ -5,17 +5,13 @@
 	import DynamicLucideIcon from '$lib/ui/icons/DynamicLucideIcon.svelte';
 	import DetailTocNavList from '$lib/ui/detail/DetailTocNavList.svelte';
 	import ThemeIcon from './ThemeIcon.svelte';
-	import { X, ChevronDown, List, Calendar, NotebookPen, FileText, Home } from 'lucide-svelte';
+	import { X, ChevronDown, List, Calendar, NotebookPen, FileText, Home, Menu } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 	import { tick } from 'svelte';
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { userStore } from '$lib/shared/stores/userStore';
-	import { windowStore } from '$lib/shared/stores/windowStore.svelte';
-	import { authModalStore } from '$lib/shared/stores/authModalStore';
 	import { ownerStatusStore } from '$lib/features/owner-status/store.svelte';
-	import { User } from 'lucide-svelte';
 	import { websiteInfoCtx } from '$lib/features/website-info/context';
 	import { detailPanelCtx } from '$lib/shared/detail-panel/context';
 	import { resolveHomeThemeConfig } from '$lib/features/home/theme';
@@ -34,7 +30,7 @@
 
 	const websiteInfoStore = websiteInfoCtx.selectModelData((data) => data ?? null);
 	const websiteNameStore = websiteInfoCtx.selectModelData(
-		(data) => data?.website_name || '墨 手记'
+		(data) => data?.website_name || 'Yu的博客空间'
 	);
 	const siteAvatar = $derived(resolveHomeThemeConfig($websiteInfoStore).hero?.avatarUrl || '');
 	const detailKindStore = detailPanelCtx.selectModelData((data) => data?.kind ?? null);
@@ -181,14 +177,12 @@
 		<!-- 1. Collapsed Header -->
 		<div class="relative z-10 flex h-[3.25rem] items-center justify-between px-3">
 			<!-- Left: Avatar & Title -->
-			<div class="flex items-center gap-3 overflow-hidden">
-				<button
-					onclick={(e) => {
-						e.stopPropagation();
-						isMobileMenuOpen = !isMobileMenuOpen;
-					}}
-					class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-transform active:scale-90"
-				>
+			<button
+				type="button"
+				onclick={() => (isMobileMenuOpen = !isMobileMenuOpen)}
+				class="flex items-center gap-2.5 overflow-hidden text-left py-1 pr-2 rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/5 active:scale-95"
+			>
+				<div class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
 					<div
 						class="h-8 w-8 shrink-0 overflow-hidden rounded-full border border-ink-100 dark:border-ink-700"
 					>
@@ -216,32 +210,34 @@
 								: 'bg-ink-400 dark:bg-ink-500'}"
 						></span>
 					</span>
-				</button>
+				</div>
 
 				<div
-					class="relative min-w-0 flex-1 flex flex-col justify-center py-0.5 transition-all duration-300"
+					class="relative min-w-0 flex-1 flex flex-col justify-center transition-all duration-300"
 					class:opacity-0={isMobileMenuOpen}
 				>
 					{#if showPageTitle}
 						<span
 							transition:fly={{ y: 10, duration: 300 }}
-							class="truncate font-serif text-sm font-bold leading-tight text-ink-900 dark:text-jade-100"
+							class="truncate font-serif text-sm font-bold leading-tight text-ink-900 dark:text-jade-100 flex items-center gap-1"
 						>
 							{currentTitle}
+							<ChevronDown size={14} class="opacity-60 shrink-0" />
 						</span>
 					{:else}
 						<span
 							transition:fly={{ y: -10, duration: 300 }}
-							class="truncate font-serif text-sm font-bold leading-tight text-ink-900 dark:text-jade-100"
+							class="truncate font-serif text-sm font-bold leading-tight text-ink-900 dark:text-jade-100 flex items-center gap-1"
 						>
 							{$websiteNameStore}
+							<ChevronDown size={14} class="opacity-60 shrink-0" />
 						</span>
 					{/if}
 				</div>
-			</div>
+			</button>
 
-			<!-- Right: Actions -->
-			<div class="flex items-center gap-1">
+			<!-- Right: Actions & Menu Toggle -->
+			<div class="flex items-center gap-1.5">
 				{#if $detailTocStore.length > 0 || hasRelatedContent}
 					<button
 						onclick={(e) => {
@@ -249,11 +245,32 @@
 							isMobileMenuOpen = false;
 							isTocOpen = true;
 						}}
+						title="本页目录导航"
 						class="flex h-9 w-9 items-center justify-center rounded-full text-ink-600 transition-colors hover:bg-black/5 dark:text-ink-300 dark:hover:bg-white/10"
 					>
 						<List size={20} />
 					</button>
 				{/if}
+
+				<!-- Dedicated Menu Toggle Button -->
+				<button
+					type="button"
+					onclick={(e) => {
+						e.stopPropagation();
+						isMobileMenuOpen = !isMobileMenuOpen;
+					}}
+					aria-label={isMobileMenuOpen ? '关闭导航菜单' : '打开导航菜单'}
+					title={isMobileMenuOpen ? '关闭导航' : '导航菜单'}
+					class="flex h-9 items-center gap-1 rounded-full bg-ink-100/80 px-2.5 text-xs font-semibold text-ink-800 transition-all hover:bg-ink-200 active:scale-95 dark:bg-ink-800 dark:text-ink-100 dark:hover:bg-ink-700"
+				>
+					{#if isMobileMenuOpen}
+						<X size={18} class="text-ink-600 dark:text-ink-300" />
+						<span>关闭</span>
+					{:else}
+						<Menu size={18} class="text-jade-600 dark:text-jade-400" />
+						<span>菜单</span>
+					{/if}
+				</button>
 			</div>
 		</div>
 
@@ -304,32 +321,6 @@
 							<span class="text-sm font-medium">返回首页</span>
 						</a>
 					{/if}
-					{#if $userStore.isLogin}
-						<button
-							type="button"
-							onclick={() => {
-								handleNavigate();
-								windowStore.open('用户中心', null, 'user-center');
-							}}
-							class="mb-2 flex w-full items-center gap-3 rounded-default border border-jade-200 bg-jade-50/70 px-3 py-2 text-jade-700 dark:border-jade-800 dark:bg-jade-900/30 dark:text-jade-200"
-						>
-							<User size={16} />
-							<span class="text-sm font-medium">用户中心</span>
-						</button>
-					{:else}
-						<button
-							type="button"
-							class="mb-2 flex items-center gap-3 rounded-default border border-ink-200 bg-white/60 px-3 py-2 text-ink-700 dark:border-ink-700 dark:bg-ink-800/60 dark:text-ink-200"
-							onclick={() => {
-								isMobileMenuOpen = false;
-								authModalStore.open('mobile-nav');
-							}}
-						>
-							<User size={16} />
-							<span class="text-sm font-medium">登录</span>
-						</button>
-					{/if}
-
 					{#each menuTree as item (item.url)}
 						{@const active = isParentActive(item)}
 						{@const hasChildren = item.children && item.children.length > 0}

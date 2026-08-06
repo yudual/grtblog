@@ -68,13 +68,27 @@
 	const subtitle = $derived(
 		config?.subtitle ?? `近 ${chartDays} 天的数字足迹：逻辑的向上生长，感性的向下扎根。`
 	);
-	const statusLabel = $derived(config?.statusLabel ?? pulse?.statusLabel ?? 'Steady');
+	const statusLabel = $derived(config?.statusLabel ?? resolveStatusLabel(pulse?.statusLabel));
 	const rangeStartLabel = $derived(config?.rangeLabelStart ?? pulse?.startDate ?? 'Start');
 	const rangeEndLabel = $derived(config?.rangeLabelEnd ?? pulse?.endDate ?? 'Today');
-	const postsLegend = $derived(config?.legend?.posts ?? 'Article');
-	const momentsLegend = $derived(config?.legend?.moments ?? 'Moment');
+	const postsLegend = $derived(config?.legend?.posts ?? '文章');
+	const momentsLegend = $derived(config?.legend?.moments ?? '手记');
 	const maxPostsInView = $derived(Math.max(...displayData.map((item) => item.posts), 0));
 	const maxMomentsInView = $derived(Math.max(...displayData.map((item) => item.moments), 0));
+
+	function resolveStatusLabel(value?: string): string {
+		const normalized = value?.trim();
+		if (!normalized) return '暂时安静';
+		return (
+			(
+				{
+					Quiet: '暂时安静',
+					Steady: '稳定更新',
+					Active: '持续创作'
+				} as Record<string, string>
+			)[normalized] ?? normalized
+		);
+	}
 
 	function calcBarHeight(value: number, maxValue: number): string {
 		if (maxValue <= 0 || value <= 0) {
@@ -102,15 +116,15 @@
 
 			<div class="flex gap-8 font-mono">
 				<div class="flex flex-col">
-					<span class="text-[10px] uppercase text-ink-400">Articles</span>
+					<span class="text-[10px] uppercase text-ink-400">{postsLegend}</span>
 					<span class="text-2xl text-jade-600 dark:text-jade-400">{totalPosts}</span>
 				</div>
 				<div class="flex flex-col">
-					<span class="text-[10px] uppercase text-ink-400">Moments</span>
+					<span class="text-[10px] uppercase text-ink-400">{momentsLegend}</span>
 					<span class="text-2xl text-ink-600 dark:text-ink-300">{totalMoments}</span>
 				</div>
 				<div class="flex flex-col">
-					<span class="text-[10px] uppercase text-ink-400">Status</span>
+					<span class="text-[10px] uppercase text-ink-400">状态</span>
 					<span class="text-2xl text-amber-500 italic">{statusLabel}</span>
 				</div>
 			</div>
@@ -158,9 +172,9 @@
 						>
 							<div class="text-[10px] font-mono text-ink-400">{data.date}</div>
 							<div class="text-xs font-medium">
-								<span class="text-jade-600">{data.posts} Posts</span>
+								<span class="text-jade-600">{data.posts} {postsLegend}</span>
 								<span class="mx-1 opacity-20">/</span>
-								<span>{data.moments} Moments</span>
+								<span>{data.moments} {momentsLegend}</span>
 							</div>
 						</div>
 					{/if}

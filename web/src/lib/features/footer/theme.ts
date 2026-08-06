@@ -4,40 +4,26 @@ import type { FooterThemeConfig, FooterThemeLink, FooterThemeSection } from './t
 const defaultFooterConfig: FooterThemeConfig = {
 	sections: [
 		{
-			title: '想要了解我',
-			links: [
-				{ name: '关于我', href: '/about' },
-				{ name: '本站历史', href: '/about-site' },
-				{ name: '关于此项目', href: '/about-project' }
-			]
-		},
-		{
-			title: '你也许在找',
+			title: '这个空间',
 			links: [
 				{ name: '归档', href: '/posts' },
-				{ name: '友链', href: '/friends' },
 				{ name: 'RSS', href: '/feed' },
-				{ name: '时间线', href: '/timeline' },
-				{ name: '监控', href: 'https://status.grtsinry43.com' }
+				{ name: '时间线', href: '/timeline' }
 			]
 		},
 		{
-			title: '联系我叭',
-			links: [
-				{ name: '写留言', href: '/message' },
-				{ name: '发邮件', href: 'mailto:grtsinry43@outlook.com' },
-				{ name: 'GitHub', href: 'https://github.com/grtsinry43' }
-			]
+			title: '联系',
+			links: [{ name: '写留言', href: '/message' }]
 		}
 	],
-	brandName: "Grtsinry43's Blog.",
-	brandTagline: '总之岁月漫长，然而值得等待',
+	brandName: 'Yu的博客空间',
+	brandTagline: '记录工作、生活和一路上的新发现',
 	copyrightStartYear: 2022,
-	copyrightOwner: 'grtsinry43',
+	copyrightOwner: 'Yu',
 	beianText: '',
 	beianUrl: 'https://beian.miit.gov.cn/',
 	beianGongAnText: '',
-	designedWithText: 'Designed by Grtsinry43 with ❤',
+	designedWithText: '由 Yu 维护',
 	presenceConnectedText: '正在有 {count} 位小伙伴看着我的网站呐',
 	presenceLoadingText: '正在同步在线状态...',
 	siteStartTime: '2022-01-01T00:00:00+08:00',

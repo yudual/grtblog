@@ -6,7 +6,8 @@ import type { FriendLink, FriendApplyForm, FriendLinkApplyConfig } from './types
  */
 export const getFriendLinks = async (fetcher?: typeof fetch): Promise<FriendLink[]> => {
 	const api = getApi(fetcher);
-	return api<FriendLink[]>('/public/friend-links');
+	const res = await api<FriendLink[]>('/public/friend-links').catch(() => null);
+	return res ?? [];
 };
 
 /**
@@ -16,7 +17,15 @@ export const getFriendLinkApplyConfig = async (
 	fetcher?: typeof fetch
 ): Promise<FriendLinkApplyConfig> => {
 	const api = getApi(fetcher);
-	return api<FriendLinkApplyConfig>('/public/friend-links/apply-config');
+	const res = await api<FriendLinkApplyConfig>('/public/friend-links/apply-config').catch(
+		() => null
+	);
+	return (
+		res ?? {
+			enabled: true,
+			requirements: '欢迎互换友链，请确保站点内容健康丰富！'
+		}
+	);
 };
 
 /**

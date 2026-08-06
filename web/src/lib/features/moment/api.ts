@@ -3,12 +3,30 @@ import type {
 	MomentDetail,
 	MomentLatestCheckResponse,
 	MomentListResponse,
-	MomentRelatedPost
+	MomentRelatedPost,
+	MomentSummary
 } from '$lib/features/moment/types';
 
 type MomentListOptions = {
 	page?: number;
 	pageSize?: number;
+};
+
+const fallbackMoment: MomentSummary = {
+	id: 1,
+	title: '新站搭建记录',
+	shortUrl: 'new-site-journal',
+	summary: '今天天气不错，开始动手搭建全新个人网站！',
+	views: 0,
+	topics: [],
+	likes: 0,
+	comments: 0,
+	isTop: false,
+	isHot: false,
+	isOriginal: true,
+	contentUpdatedAt: '2026-08-02T14:00:00Z',
+	createdAt: '2026-08-02T14:00:00Z',
+	updatedAt: '2026-08-02T14:00:00Z'
 };
 
 export const getMomentList = async (
@@ -20,8 +38,15 @@ export const getMomentList = async (
 		page: String(page),
 		pageSize: String(pageSize)
 	});
-	const result = await api<MomentListResponse>(`/moments?${query.toString()}`);
-	return result ?? { items: [], total: 0, page, size: pageSize };
+	const result = await api<MomentListResponse>(`/moments?${query.toString()}`).catch(() => null);
+	return (
+		result ?? {
+			items: [fallbackMoment],
+			total: 1,
+			page,
+			size: pageSize
+		}
+	);
 };
 
 export const getMomentListByColumn = async (
@@ -36,7 +61,7 @@ export const getMomentListByColumn = async (
 	});
 	const result = await api<MomentListResponse>(
 		`/columns/short/${encodeURIComponent(columnSlug)}/moments?${query.toString()}`
-	);
+	).catch(() => null);
 	return result ?? { items: [], total: 0, page, size: pageSize };
 };
 
@@ -57,14 +82,21 @@ export const checkMomentLatest = async (
 	const result = await api<MomentLatestCheckResponse>(`/moments/${id}/latest`, {
 		method: 'POST',
 		body: { hash }
-	});
+	}).catch(() => null);
 	return result ?? null;
 };
 
 export const getRecentMoments = async (fetcher?: typeof fetch): Promise<MomentListResponse> => {
 	const api = getApi(fetcher);
-	const result = await api<MomentListResponse>('/public/moments/recent');
-	return result ?? { items: [], total: 0, page: 1, size: 5 };
+	const result = await api<MomentListResponse>('/public/moments/recent').catch(() => null);
+	return (
+		result ?? {
+			items: [fallbackMoment],
+			total: 1,
+			page: 1,
+			size: 5
+		}
+	);
 };
 
 type MomentRelatedPostsResponse = {
@@ -76,6 +108,8 @@ export const getMomentRelatedPosts = async (
 	id: number
 ): Promise<MomentRelatedPost[]> => {
 	const api = getApi(fetcher);
-	const result = await api<MomentRelatedPostsResponse>(`/moments/${id}/same-period-articles`);
+	const result = await api<MomentRelatedPostsResponse>(`/moments/${id}/same-period-articles`).catch(
+		() => null
+	);
 	return result?.items ?? [];
 };

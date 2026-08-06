@@ -4,6 +4,7 @@ import type { WebsiteInfoMap } from '$lib/features/website-info/types';
 import { getPostDetail } from '$lib/features/post/api';
 import { getMomentDetail } from '$lib/features/moment/api';
 import { getPageDetail } from '$lib/features/page/api';
+import { getProjectDetail } from '$lib/features/project/api';
 import { resolveSeoMeta, resolveOgTag } from '$lib/shared/seo/metadata';
 import { renderOgImage } from '$lib/server/og-image-renderer';
 import { error } from '@sveltejs/kit';
@@ -12,9 +13,11 @@ export const trailingSlash = 'never';
 
 const MOMENT_PATTERN = /^moments\/(\d{4})\/(\d{2})\/(\d{2})\/([^/]+)$/;
 const POST_PATTERN = /^posts\/([^/]+)$/;
+const PROJECT_PATTERN = /^projects\/([^/]+)$/;
 
 const KNOWN_LIST_ROUTES = new Set([
 	'posts',
+	'projects',
 	'moments',
 	'thinkings',
 	'tags',
@@ -49,6 +52,14 @@ async function fetchRouteData(
 		const moment = await getMomentDetail(fetcher, slug);
 		if (!moment) error(404, 'Moment not found');
 		return { pathname, routeData: { moment } };
+	}
+
+	const projectMatch = path.match(PROJECT_PATTERN);
+	if (projectMatch) {
+		const slug = projectMatch[1]!;
+		const project = await getProjectDetail(fetcher, slug);
+		if (!project) error(404, 'Project not found');
+		return { pathname, routeData: { project } };
 	}
 
 	if (isKnownListRoute(path)) {

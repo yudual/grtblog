@@ -6,12 +6,12 @@ export const getTagContents = async (
 	id: number
 ): Promise<TagContents> => {
 	const api = getApi(fetcher);
-	const result = await api<TagContents>(`/tags/${id}/contents`);
+	const result = await api<TagContents>(`/tags/${id}/contents`).catch(() => null);
 	return result ?? { articles: [], moments: [] };
 };
 
 export const getPublicTags = async (fetcher: typeof fetch | undefined): Promise<PublicTag[]> => {
 	const api = getApi(fetcher);
-	const result = await api<PublicTag[]>('/public/tags');
+	const result = await api<PublicTag[]>('/public/tags').catch(() => null);
 	return result ?? [];
 };

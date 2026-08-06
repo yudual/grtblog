@@ -15,7 +15,7 @@ export const getAlbumList = async (
 		page: String(page),
 		pageSize: String(pageSize)
 	});
-	const result = await api<AlbumListResponse>(`/albums?${query.toString()}`);
+	const result = await api<AlbumListResponse>(`/albums?${query.toString()}`).catch(() => null);
 	return result ?? { items: [], total: 0, page, size: pageSize };
 };
 

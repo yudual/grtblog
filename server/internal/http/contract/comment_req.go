@@ -11,7 +11,7 @@ type CreateCommentLoginReq struct {
 type CreateCommentVisitorReq struct {
 	Content   string  `json:"content" validate:"required,max=500"`
 	NickName  *string `json:"nickName" validate:"required,max=255"`
-	Email     *string `json:"email" validate:"required,max=255"`
+	Email     *string `json:"email" validate:"omitempty,max=255"`
 	Website   *string `json:"website" validate:"max=255"`
 	ParentID  *int64  `json:"parentId"`
 	VisitorID string  `json:"visitorId"`

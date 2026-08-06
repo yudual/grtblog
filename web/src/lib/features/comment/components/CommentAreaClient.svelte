@@ -11,7 +11,6 @@
 	import { realtimeWSCore } from '$lib/shared/ws/realtime-core';
 	import type { SiteActivityPayload } from '$lib/features/realtime-activity/types';
 	import { userStore } from '$lib/shared/stores/userStore';
-	import { authModalStore } from '$lib/shared/stores/authModalStore';
 
 	let {
 		areaId,
@@ -167,18 +166,6 @@
 					>
 				{/if}
 			</div>
-			{#if !$userStore.isLogin}
-				<button
-					onclick={() => authModalStore.open('comment-area')}
-					class="text-[10px] text-ink-800/40 dark:text-ink-200/40 hover:text-jade-600 dark:hover:text-jade-400 underline decoration-dotted underline-offset-4 font-serif transition-colors outline-none"
-				>
-					[ 登录后评论 ]
-				</button>
-			{:else}
-				<div class="text-[10px] text-jade-700 dark:text-jade-400 font-serif tracking-wide">
-					已登录，评论将自动使用账号身份
-				</div>
-			{/if}
 		</div>
 
 		<div class="mb-16">

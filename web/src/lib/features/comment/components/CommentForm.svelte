@@ -122,11 +122,11 @@
 			if ($userStore.isLogin) {
 				return await createCommentLogin(undefined, $areaIdStore, { content, parentId, visitorId });
 			}
-			if (!$guestNameStore || !$guestEmailStore) throw new Error('请填写称呼和邮箱');
+			if (!$guestNameStore) throw new Error('请填写称呼');
 			return await createCommentVisitor(undefined, $areaIdStore, {
 				content,
 				nickName: $guestNameStore,
-				email: $guestEmailStore,
+				email: $guestEmailStore || undefined,
 				website: $guestSiteStore || undefined,
 				parentId,
 				visitorId
@@ -260,7 +260,7 @@
 					type="email"
 					value={$guestEmailStore}
 					oninput={updateGuestField('guestEmail')}
-					placeholder="邮箱 (保密) *"
+					placeholder="邮箱（可选）"
 					variant="underline"
 					icon={mailIcon}
 					inputClass="text-sm font-serif text-ink-900 dark:text-ink-100 placeholder:text-ink-300 dark:placeholder:text-ink-600/50"

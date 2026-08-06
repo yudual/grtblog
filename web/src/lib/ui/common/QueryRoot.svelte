@@ -29,7 +29,7 @@
 		Provider = QueryClientProvider;
 		if (loader) {
 			const loaded = await loader();
-			Loaded = loaded.default;
+			Loaded = (loaded && loaded.default) ? loaded.default : (loaded as unknown as LoaderComponent);
 		}
 		ready = true;
 	});

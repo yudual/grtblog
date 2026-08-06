@@ -11,9 +11,15 @@
 		title: string;
 		showThreshold?: number;
 		showCommentShortcut?: boolean;
+		shareButtonTitle?: string;
 	}
 
-	let { title, showThreshold = 300, showCommentShortcut = true }: Props = $props();
+	let {
+		title,
+		showThreshold = 300,
+		showCommentShortcut = true,
+		shareButtonTitle = '分享文章'
+	}: Props = $props();
 
 	let scrollY = $state(0);
 	let clientHeight = $state(0);
@@ -130,7 +136,7 @@
 
 				<ShareAction
 					iconSize={18}
-					buttonTitle="分享文章"
+					buttonTitle={shareButtonTitle}
 					className="inline-flex h-9 w-9 items-center justify-center rounded-default text-ink-500 transition-colors hover:bg-ink-100/50 hover:text-jade-600 dark:text-ink-400 dark:hover:bg-ink-800/50 dark:hover:text-jade-400"
 					shareTitle={title}
 				/>

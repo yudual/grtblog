@@ -7,22 +7,17 @@
 	let { config }: { config?: HomeHeroThemeConfig } = $props();
 
 	const defaultTitleTemplate: HomeHeroTemplateNode[] = [
-		{ type: 'h1', text: 'Hi! 👋', variant: 'hero_h1_highlight' },
+		{ type: 'h1', text: '你好！👋', variant: 'hero_h1_highlight' },
 		{ type: 'br' },
-		{ type: 'h1', text: "I'm grtsinry43", variant: 'hero_h1_primary' }
+		{ type: 'h1', text: '我是 Yu', variant: 'hero_h1_primary' }
 	];
-	const defaultDescription =
-		'Java & JavaScript full-stack developer committed to crafting excellent software.';
+	const defaultDescription = '一个普通工科人的个人空间，记录工作、生活和一路上的新发现。';
 	const defaultAvatarUrl = '';
 	const defaultMottoLines = [
 		'热衷于在逻辑与感性的缝隙中构建数字花园。',
 		'也许，代码是现代的诗歌，而文字是思想的快照。'
 	];
-	const defaultSocials: HomeHeroSocialLink[] = [
-		{ icon: 'github', name: 'GitHub', href: 'https://github.com/grtinry43' },
-		{ icon: 'mail', name: 'Email', href: 'mailto:grtsinry43@outlook.com' },
-		{ icon: 'rss', name: 'RSS', href: '/feed' }
-	];
+	const defaultSocials: HomeHeroSocialLink[] = [{ icon: 'rss', name: '订阅更新', href: '/feed' }];
 
 	const variantClassMap: Record<string, string> = {
 		hero_h1_highlight: 'italic text-jade-600 dark:text-jade-400 font-light text-4xl',
@@ -162,7 +157,7 @@
 						{/if}
 					{/each}
 				</div>
-				<p class="text-[11px] font-mono text-ink-500 leading-relaxed mt-4">
+				<p class="mt-4 max-w-[19rem] text-sm font-mono leading-relaxed text-ink-500">
 					{description}
 				</p>
 			</div>
@@ -193,7 +188,7 @@
 	}
 
 	.hero-scroll-hint {
-		@apply absolute right-10 bottom-8 flex h-12 w-12 items-center justify-center text-ink-400 opacity-40;
+		@apply absolute right-10 bottom-8 h-12 w-12 items-center justify-center text-ink-400 opacity-40;
 		animation: hero-scroll-bounce 1.6s ease-in-out infinite;
 	}
 
@@ -224,12 +219,13 @@
 
 	:global(.hero-title-mobile h1) {
 		display: inline;
-		font-size: 1.25rem;
+		font-size: 2rem;
+		line-height: 1.2;
 		font-weight: 700;
 	}
 
 	:global(.hero-title-mobile code) {
-		font-size: 1rem;
+		font-size: 1.5rem;
 	}
 
 	/* 特别为移动端 SocialItem 去掉文字 */

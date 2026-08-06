@@ -85,7 +85,7 @@ const normalizePathname = (pathname: string): string => {
 
 const getPageValue = (
 	routeData: UnknownRecord,
-	key: 'post' | 'moment' | 'page'
+	key: 'post' | 'moment' | 'page' | 'project'
 ): UnknownRecord | null => asRecord(routeData[key]);
 
 const getPaginationPage = (routeData: UnknownRecord): number | null => {
@@ -203,6 +203,16 @@ const resolvePageMeta = (pathname: string, search: string, routeData: UnknownRec
 		};
 	}
 
+	const project = getPageValue(routeData, 'project');
+	if (project) {
+		return {
+			pageTitle: readString(project.title),
+			description: readString(project.summary),
+			image: readString(project.cover),
+			ogType: 'article'
+		};
+	}
+
 	const categoryName = readString(routeData.categoryName);
 	if (categoryName) {
 		const page = getPaginationPage(routeData);
@@ -230,6 +240,13 @@ const resolvePageMeta = (pathname: string, search: string, routeData: UnknownRec
 		return {
 			pageTitle: resolveListPageTitle('文章归档', page),
 			description: '按时间顺序排布的思考、笔记与技术沉淀。在这里，你可以找到所有历史文章的快照。'
+		};
+	}
+
+	if (pathname === '/projects') {
+		return {
+			pageTitle: '项目',
+			description: '用文章的方式记录正在做过的项目、成果与实践。'
 		};
 	}
 

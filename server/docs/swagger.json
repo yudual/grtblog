@@ -9729,7 +9729,6 @@
             "type": "object",
             "required": [
                 "content",
-                "email",
                 "nickName"
             ],
             "properties": {

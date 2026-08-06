@@ -17,6 +17,6 @@ export const getFriendTimeline = async (
 	});
 	const result = await api<FriendTimelineListResponse>(
 		`/public/friend-timeline?${query.toString()}`
-	);
+	).catch(() => null);
 	return result ?? { items: [], total: 0, page, size: pageSize };
 };

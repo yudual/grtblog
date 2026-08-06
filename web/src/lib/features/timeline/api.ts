@@ -5,6 +5,6 @@ export const getTimelineByYear = async (
 	fetcher?: typeof fetch
 ): Promise<TimelineByYearResponse> => {
 	const api = getApi(fetcher);
-	const result = await api<TimelineByYearResponse>('/public/home/timeline-by-year');
+	const result = await api<TimelineByYearResponse>('/public/home/timeline-by-year').catch(() => null);
 	return result ?? {};
 };

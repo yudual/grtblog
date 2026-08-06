@@ -372,7 +372,7 @@
 	<meta name="description" content={seoMeta.description} />
 	<meta name="keywords" content={seoMeta.keywords} />
 	<meta name="robots" content={seoMeta.robots} />
-	<meta name="author" content="grtinry43" />
+	<meta name="author" content="Yu" />
 	<meta property="og:title" content={seoMeta.ogTitle} />
 	<meta property="og:description" content={seoMeta.ogDescription} />
 	<meta property="og:type" content={seoMeta.ogType} />

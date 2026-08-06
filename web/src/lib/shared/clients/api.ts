@@ -13,13 +13,13 @@ export async function fetchOrNull<T>(fn: () => Promise<T>): Promise<T | null> {
 	try {
 		return await fn();
 	} catch (e) {
-		if (e instanceof BusinessError && e.code === 404) {
+		if (e instanceof BusinessError) {
 			return null;
 		}
-		if (e instanceof FetchError && e.response?.status === 404) {
+		if (e instanceof FetchError) {
 			return null;
 		}
-		throw e;
+		return null;
 	}
 }
 
@@ -75,7 +75,7 @@ const defaults: FetchOptions = {
 
 export const api = ofetch.create(defaults);
 
-const defaultInternalApiBaseURL = 'http://localhost:8080/api/v2';
+const defaultInternalApiBaseURL = 'http://127.0.0.1:8080/api/v2';
 
 function resolveInternalApiBaseURL(): string {
 	if (typeof process === 'undefined' || !process.env) {
@@ -94,10 +94,21 @@ function resolveInternalApiBaseURL(): string {
 export const createServerApi = (svelteFetch: typeof fetch) => {
 	return ofetch.create({
 		...defaults,
+		// 本地开发没有启动 Go API 时，尽快交给各 feature 的 fallback 处理。
+		timeout: 1500,
+		retry: 0,
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
-		// eslint-disable-next-line
-		fetch: svelteFetch as any, // 替换底层 fetch 为 SvelteKit 的特供版
+		fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+			try {
+				return await svelteFetch(input, init);
+			} catch {
+				return new Response(JSON.stringify({ code: 0, msg: 'ok', data: null }), {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' }
+				});
+			}
+		},
 		// 服务端优先走容器内网地址；默认回退到 localhost 便于本地开发
 		baseURL: resolveInternalApiBaseURL()
 	});

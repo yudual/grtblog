@@ -25,33 +25,33 @@
 	};
 
 	const defaultNowItems = [
-		{ id: 'coding', label: 'Coding', value: 'grtblog-v2', icon: 'code2' as const },
+		{ id: 'coding', label: '正在做', value: '整理个人网站', icon: 'code2' as const },
 		{
 			id: 'reading',
-			label: 'Reading',
-			value: 'The Design of Everyday Things',
+			label: '最近在看',
+			value: '《设计与生活》',
 			icon: 'library' as const
 		},
-		{ id: 'learning', label: 'Learning', value: 'Svelte 5 & Runes', icon: 'zap' as const }
+		{ id: 'learning', label: '正在学习', value: '网站基础知识', icon: 'zap' as const }
 	];
 	const defaultStats: HomeInspirationStatItem[] = [
 		{
 			id: 'words',
-			label: 'Words',
+			label: '字数',
 			icon: 'library',
 			colorClass: 'text-jade-500',
 			source: { type: 'words_total' }
 		},
 		{
 			id: 'commits',
-			label: 'Commits',
+			label: '更新次数',
 			icon: 'github',
 			colorClass: 'text-ink-900 dark:text-ink-100',
 			source: { type: 'github_recent_push_commits' }
 		},
 		{
 			id: 'coffee',
-			label: 'Coffee',
+			label: '咖啡',
 			value: '∞',
 			icon: 'coffee',
 			colorClass: 'text-amber-500',
@@ -60,11 +60,9 @@
 	];
 
 	const sectionTitle = $derived(config?.sectionTitle || '灵感与实验场');
-	const quoteText = $derived(
-		config?.quote?.text || '“The best way to predict the future is to invent it.”'
-	);
-	const quoteAuthor = $derived(config?.quote?.author || 'Alan Kay');
-	const nowTitle = $derived(config?.now?.title || 'Now / 正在');
+	const quoteText = $derived(config?.quote?.text || '岁岁平安');
+	const quoteAuthor = $derived(config?.quote?.author || 'Yu');
+	const nowTitle = $derived(config?.now?.title || '现在');
 	const nowItems = $derived.by(
 		() =>
 			(config?.now?.items && config.now.items.length > 0
@@ -76,13 +74,13 @@
 				icon?: HomeInspirationIconName;
 			}>
 	);
-	const energyLabel = $derived(config?.energy?.label || 'High Energy');
+	const energyLabel = $derived(config?.energy?.label || '最近状态');
 	const energyIcon = $derived(resolveIcon(config?.energy?.icon, Sparkles));
-	const techTitle = $derived(config?.techStack?.title || 'Tech Stack');
+	const techTitle = $derived(config?.techStack?.title || '我的工具');
 	const techItems = $derived(
 		config?.techStack?.items && config.techStack.items.length > 0
 			? config.techStack.items
-			: ['Java', 'TypeScript', 'Svelte', 'Rust']
+			: ['写作', '设计', '记录', '学习']
 	);
 	const techIcons = $derived(
 		config?.techStack?.icons && config.techStack.icons.length > 0

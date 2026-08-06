@@ -33,21 +33,17 @@ const allowedInspirationSourceTypes = new Set([
 ]);
 
 const defaultHeroTemplate: HomeHeroTemplateNode[] = [
-	{ type: 'h1', text: 'Hi! 👋', variant: 'hero_h1_highlight' },
+	{ type: 'h1', text: '你好！👋', variant: 'hero_h1_highlight' },
 	{ type: 'br' },
-	{ type: 'h1', text: "I'm grtsinry43", variant: 'hero_h1_primary' }
+	{ type: 'h1', text: '我是 Yu', variant: 'hero_h1_primary' }
 ];
 
-const defaultHeroSocials: HomeHeroSocialLink[] = [
-	{ icon: 'github', name: 'GitHub', href: 'https://github.com/grtinry43' },
-	{ icon: 'mail', name: 'Email', href: 'mailto:grtsinry43@outlook.com' },
-	{ icon: 'rss', name: 'RSS', href: '/feed' }
-];
+const defaultHeroSocials: HomeHeroSocialLink[] = [{ icon: 'rss', name: '订阅更新', href: '/feed' }];
 
 const defaultThemeConfig: HomeThemeConfig = {
 	hero: {
 		avatarUrl: '',
-		description: 'Java & JavaScript full-stack developer committed to crafting excellent software.',
+		description: '一个普通工科人的个人空间，记录工作、生活和一路上的新发现。',
 		titleTemplate: defaultHeroTemplate,
 		mottoLines: [
 			'热衷于在逻辑与感性的缝隙中构建数字花园。',
@@ -60,55 +56,48 @@ const defaultThemeConfig: HomeThemeConfig = {
 	activityPulse: {
 		title: '创作律动',
 		subtitle: '近一年的数字足迹：逻辑的向上生长，感性的向下扎根。',
-		rangeLabelStart: '365 Days Ago',
-		rangeLabelEnd: 'Today',
+		rangeLabelStart: '一年前',
+		rangeLabelEnd: '今天',
 		legend: {
-			posts: 'Article',
-			moments: 'Moment'
+			posts: '文章',
+			moments: '手记'
 		},
 		rangeDays: 365
 	},
 	inspiration: {
 		sectionTitle: '灵感与实验场',
 		quote: {
-			text: '“The best way to predict the future is to invent it.”',
-			author: 'Alan Kay'
+			text: '岁岁平安',
+			author: 'Yu'
 		},
 		now: {
-			title: 'Now / 正在',
+			title: '现在',
 			items: [
-				{ id: 'coding', label: 'Coding', value: 'grtblog-v2', icon: 'code2' },
+				{ id: 'coding', label: '正在做', value: '整理个人网站', icon: 'code2' },
 				{
 					id: 'reading',
-					label: 'Reading',
-					value: 'The Design of Everyday Things',
+					label: '最近在看',
+					value: '《设计与生活》',
 					icon: 'library'
 				},
-				{ id: 'learning', label: 'Learning', value: 'Svelte 5 & Runes', icon: 'zap' }
+				{ id: 'learning', label: '正在学习', value: '网站基础知识', icon: 'zap' }
 			]
 		},
 		energy: {
-			label: 'High Energy',
+			label: '最近状态',
 			icon: 'sparkles'
 		},
 		stats: [
 			{
 				id: 'words',
-				label: 'Words',
+				label: '字数',
 				icon: 'library',
 				colorClass: 'text-jade-500',
 				source: { type: 'words_total' }
 			},
 			{
-				id: 'commits',
-				label: 'Commits',
-				icon: 'github',
-				colorClass: 'text-ink-900 dark:text-ink-100',
-				source: { type: 'github_recent_push_commits' }
-			},
-			{
 				id: 'coffee',
-				label: 'Coffee',
+				label: '咖啡',
 				value: '∞',
 				icon: 'coffee',
 				colorClass: 'text-amber-500',
@@ -116,12 +105,9 @@ const defaultThemeConfig: HomeThemeConfig = {
 			}
 		],
 		techStack: {
-			title: 'Tech Stack',
-			items: ['Java', 'TypeScript', 'Svelte', 'Rust'],
+			title: '我的工具',
+			items: ['写作', '设计', '记录', '学习'],
 			icons: ['code2', 'gamepad2']
-		},
-		github: {
-			username: 'grtsinry43'
 		}
 	}
 };
