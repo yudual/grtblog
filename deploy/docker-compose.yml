@@ -13,6 +13,7 @@ services:
         VITE_APP_TITLE: "${VITE_APP_TITLE:-管理后台}"
         VITE_WATERMARK_CONTENT: "${VITE_WATERMARK_CONTENT:-}"
         VITE_API_BASE_URL: "${VITE_API_BASE_URL:-/api/v2}"
+        NODE_OPTIONS: "${NODE_OPTIONS:-}"
     container_name: grtblog-server
     environment:
       APP_ENV: production
