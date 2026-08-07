@@ -50,6 +50,6 @@ jobs:
           build-args: |
             APP_VERSION=main
             BUILD_COMMIT=${{ github.sha }}
-            NODE_OPTIONS=--max-old-space-size=768
+            NODE_OPTIONS=--max-old-space-size=2048
           cache-from: type=gha,scope=main-${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=main-${{ matrix.name }}
