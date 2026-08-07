@@ -2,7 +2,7 @@
 
 -- The footer links to /message. Keep it as a normal built-in page so it has
 -- the same comment area, moderation, metrics, and admin management as other pages.
-INSERT INTO page (title, description, short_url, is_enabled, is_builtin, toc, content, content_hash)
+INSERT INTO page (title, description, short_url, is_enabled, is_builtin, toc, content, content_hash, content_updated_at)
 VALUES (
     '留言',
     '欢迎留下你的想法、建议或近况。',
@@ -11,7 +11,8 @@ VALUES (
     TRUE,
     '[]'::jsonb,
     '欢迎留下你的想法、建议或近况。',
-    md5('留言' || '欢迎留下你的想法、建议或近况。' || '欢迎留下你的想法、建议或近况。')
+    md5('留言' || '欢迎留下你的想法、建议或近况。' || '欢迎留下你的想法、建议或近况。'),
+    NOW()
 )
 ON CONFLICT (short_url) DO NOTHING;
 
