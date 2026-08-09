@@ -8,11 +8,11 @@ import type { LayoutServerLoad } from './$types';
 
 const defaultInternalBaseURL = 'http://127.0.0.1:8080';
 
+const removedMenuPaths = new Set(['/tags', '/thinkings', '/friends', '/friends-timeline']);
+
 const isRemovedMenu = (url: string): boolean => {
 	const pathname = url.split('?')[0].replace(/\/+$/, '') || '/';
-	return (
-		pathname === '/thinkings' || pathname.startsWith('/thinkings/page/') || pathname === '/friends'
-	);
+	return removedMenuPaths.has(pathname) || pathname.startsWith('/thinkings/page/');
 };
 
 const removeRemovedMenus = (items: NavMenuItem[]): NavMenuItem[] =>

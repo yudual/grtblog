@@ -11,8 +11,50 @@ permissions:
   packages: write
 
 jobs:
+  preflight:
+    name: Preflight database migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: preflight
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: preflight
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d preflight"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: false
+
+      - name: Run every Goose migration in a temporary database
+        working-directory: server
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bin"
+          GOBIN="$RUNNER_TEMP/bin" go install github.com/pressly/goose/v3/cmd/goose@v3.26.0
+          "$RUNNER_TEMP/bin/goose" \
+            -table public.goose_db_version \
+            -dir migrations \
+            postgres \
+            'postgres://postgres:preflight@127.0.0.1:5432/preflight?sslmode=disable' \
+            up
+
   build:
     name: Build ${{ matrix.name }}
+    needs: preflight
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -48,8 +90,56 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/${{ matrix.name }}:main
             ghcr.io/${{ github.repository_owner }}/${{ matrix.name }}:${{ github.sha }}
           build-args: |
-            APP_VERSION=main
+            APP_VERSION=${{ github.sha }}
             BUILD_COMMIT=${{ github.sha }}
+            VITE_APP_BASE=/admin/
+            VITE_APP_NAME=Grtblog Admin
+            VITE_APP_TITLE=管理后台
+            VITE_WATERMARK_CONTENT=
+            VITE_API_BASE_URL=/api/v2
             NODE_OPTIONS=--max-old-space-size=2048
           cache-from: type=gha,scope=main-${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=main-${{ matrix.name }}
+
+  deploy:
+    name: Deploy exact commit to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+      VPS_REPO_PREFIX: ghcr.io/${{ github.repository_owner }}/
+      TARGET_VERSION: ${{ github.sha }}
+
+    steps:
+      - name: Checkout deployment script
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          : "${VPS_HOST:?Missing GitHub secret VPS_HOST}"
+          : "${VPS_USER:?Missing GitHub secret VPS_USER}"
+          : "${VPS_SSH_KEY:?Missing GitHub secret VPS_SSH_KEY}"
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_KEY" > "$HOME/.ssh/vps_deploy_key"
+          chmod 600 "$HOME/.ssh/vps_deploy_key"
+          ssh-keyscan -H "$VPS_HOST" >> "$HOME/.ssh/known_hosts"
+
+      - name: Upload update script
+        run: |
+          set -euo pipefail
+          remote_path="${VPS_DEPLOY_PATH:-/home/azureuser/grtblog/deploy}"
+          scp -i "$HOME/.ssh/vps_deploy_key" \
+            deploy/update.sh \
+            "$VPS_USER@$VPS_HOST:$remote_path/update.sh"
+
+      - name: Pull, migrate, clear ISR, and restart
+        run: |
+          set -euo pipefail
+          remote_path="${VPS_DEPLOY_PATH:-/home/azureuser/grtblog/deploy}"
+          ssh -i "$HOME/.ssh/vps_deploy_key" "$VPS_USER@$VPS_HOST" \
+            "cd '$remote_path' && chmod +x update.sh && IMAGE_REPO_PREFIX='$VPS_REPO_PREFIX' ./update.sh '$TARGET_VERSION' '$TARGET_VERSION'"
