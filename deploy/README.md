@@ -144,6 +144,8 @@ Nginx 不会被重建。通过 `resolver 127.0.0.11 valid=10s` 自动发现新�
 - `VPS_SSH_KEY`：登录 VPS 的完整 SSH 私钥
 - `VPS_DEPLOY_PATH`：可选，默认 `/home/azureuser/grtblog/deploy`
 
+SSH 用户还需要能够执行免密 `sudo`，因为 ISR 静态页面由容器用户写入，部署时需要管理员权限清理旧缓存。
+
 脚本只清理 `storage/html` 和 `storage/meta/isr`，不会删除上传文件、备份、PostgreSQL
 或 Redis 数据。远端已有的 HTTPS 证书和自定义 Nginx 配置也不会被覆盖。
 

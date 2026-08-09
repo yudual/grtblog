@@ -142,4 +142,4 @@ jobs:
           set -euo pipefail
           remote_path="${VPS_DEPLOY_PATH:-/home/azureuser/grtblog/deploy}"
           ssh -i "$HOME/.ssh/vps_deploy_key" "$VPS_USER@$VPS_HOST" \
-            "cd '$remote_path' && chmod +x update.sh && IMAGE_REPO_PREFIX='$VPS_REPO_PREFIX' ./update.sh '$TARGET_VERSION' '$TARGET_VERSION'"
+            "cd '$remote_path' && chmod +x update.sh && sudo -n env IMAGE_REPO_PREFIX='$VPS_REPO_PREFIX' ./update.sh '$TARGET_VERSION' '$TARGET_VERSION'"

@@ -16,6 +16,14 @@ die() {
   exit 1
 }
 
+# The bind-mounted ISR files are written by the container's app user. Re-run
+# as root when the SSH account has passwordless sudo, so cache cleanup and
+# ownership changes work consistently on fresh and existing installations.
+if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
+  command -v sudo >/dev/null 2>&1 || die 'Root privileges or sudo are required'
+  exec sudo -n env "IMAGE_REPO_PREFIX=${IMAGE_REPO_PREFIX:-}" "$0" "$@"
+fi
+
 on_error() {
   printf '[update] Update failed. Recent app logs:\n' >&2
   compose logs --tail=80 server renderer >&2 || true
