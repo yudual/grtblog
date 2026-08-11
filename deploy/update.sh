@@ -26,7 +26,7 @@ fi
 
 on_error() {
   printf '[update] Update failed. Recent app logs:\n' >&2
-  compose logs --tail=80 server renderer >&2 || true
+  compose logs --tail=80 server renderer nginx caddy >&2 || true
 }
 
 trap on_error ERR
@@ -89,7 +89,7 @@ REDIS_PREFIX="${REDIS_PREFIX:-$(read_env_value REDIS_PREFIX)}"
 REDIS_PREFIX="${REDIS_PREFIX:-grtblog:}"
 REDIS_PASSWORD="${REDIS_PASSWORD:-$(read_env_value REDIS_PASSWORD)}"
 NGINX_PORT="${NGINX_PORT:-$(read_env_value NGINX_PORT)}"
-NGINX_PORT="${NGINX_PORT:-80}"
+NGINX_PORT="${NGINX_PORT:-8080}"
 
 export APP_VERSION="$TARGET_VERSION"
 export BUILD_COMMIT="$EXPECTED_COMMIT"
@@ -103,7 +103,7 @@ grep -Fxq "$server_image" <<< "$compose_images" || die "Compose is not configure
 grep -Fxq "$renderer_image" <<< "$compose_images" || die "Compose is not configured for $renderer_image"
 
 log "Pulling server and renderer images for $TARGET_VERSION"
-compose pull server renderer
+compose pull server renderer caddy
 
 log 'Running migrations from the new server image'
 compose run --rm --no-deps -T server sh -c 'goose -table public.goose_db_version -dir /app/migrations postgres "$DB_DSN" up' </dev/null
@@ -123,7 +123,7 @@ fi
 
 log 'Clearing ISR Redis keys and generated HTML snapshots'
 clear_isr_redis
-compose stop server renderer
+compose stop server renderer nginx caddy
 
 [[ -d storage/html && ! -L storage/html ]] || die 'storage/html must be a real directory'
 [[ -d storage/meta && ! -L storage/meta ]] || die 'storage/meta must be a real directory'
@@ -135,7 +135,7 @@ fi
 mkdir -p storage/meta/isr
 
 log 'Starting the exact pulled images without a local build'
-compose up -d --no-build --force-recreate server renderer
+compose up -d --no-build --force-recreate server renderer nginx caddy
 
 health_url="http://127.0.0.1:${NGINX_PORT}/health/readiness"
 ready=0
@@ -148,7 +148,7 @@ for _ in $(seq 1 90); do
 done
 [[ "$ready" == 1 ]] || die "Readiness check timed out: $health_url"
 
-for container in grtblog-server grtblog-renderer; do
+for container in grtblog-server grtblog-renderer grtblog-nginx grtblog-caddy; do
   running="$(docker inspect -f '{{.State.Running}}' "$container" 2>/dev/null || true)"
   [[ "$running" == 'true' ]] || die "$container is not running"
 done

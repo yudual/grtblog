@@ -12,6 +12,7 @@ Update at least these values in `.env`:
 - `POSTGRES_PASSWORD`
 - `AUTH_SECRET`
 - `IMAGE_REPO_PREFIX` / `APP_VERSION` (see below)
+- `SITE_DOMAIN`：域名，例如 `yudual.net`
 - `APP_UPDATE_CHECK_ENABLED` / `APP_UPDATE_CHECK_REPO` / `APP_UPDATE_CHANNEL`
 
 更新检查策略：
@@ -124,12 +125,13 @@ docker compose exec server goose -table public.goose_db_version -dir /app/migrat
 
 ```bash
 # Update APP_VERSION in .env, then:
-docker compose pull server renderer   # prebuilt images
-docker compose up -d server renderer
+docker compose pull server renderer caddy   # prebuilt images
+docker compose up -d server renderer nginx caddy
 # For local builds: docker compose up -d --build server renderer
 ```
 
-Nginx 不会被重建。通过 `resolver 127.0.0.11 valid=10s` 自动发现新容器 IP，无需手动 reload。
+内层 Nginx 使用 `NGINX_PORT`（默认 8080），Caddy 对外监听 80/443 并自动申请、续期
+`SITE_DOMAIN` 的 HTTPS 证书。Caddy 通过 Compose 内网转发到 Nginx，无需手动 reload。
 
 ## 2.3) GitHub Actions 自动部署
 
@@ -147,24 +149,24 @@ Nginx 不会被重建。通过 `resolver 127.0.0.11 valid=10s` 自动发现新�
 SSH 用户还需要能够执行免密 `sudo`，因为 ISR 静态页面由容器用户写入，部署时需要管理员权限清理旧缓存。
 
 脚本只清理 `storage/html` 和 `storage/meta/isr`，不会删除上传文件、备份、PostgreSQL
-或 Redis 数据。远端已有的 HTTPS 证书和自定义 Nginx 配置也不会被覆盖。
+或 Redis 数据。HTTPS 证书保存在 `grtblog_caddy_data` 卷中，不会被更新脚本删除。
 
 如果后台提示发现新版本，推荐操作仍然是：
 
 1. 修改 `.env` 中的 `APP_VERSION`
-2. 执行 `docker compose pull server renderer`
-3. 执行 `docker compose up -d server renderer`
+2. 执行 `docker compose pull server renderer caddy`
+3. 执行 `docker compose up -d server renderer nginx caddy`
 
 后台会展示目标版本、更新通道、变更说明链接，以及预构建/本地构建两种升级命令。
 
 ## 3) Verify
 
 ```bash
-curl -f http://localhost:${NGINX_PORT:-80}/healthz
-curl -f http://localhost:${NGINX_PORT:-80}/health/liveness
+curl -f http://localhost:${NGINX_PORT:-8080}/healthz
+curl -f http://localhost:${NGINX_PORT:-8080}/health/liveness
 ```
 
-Admin panel URL: `http://localhost:${NGINX_PORT:-80}/admin/`
+Admin panel URL: `https://<SITE_DOMAIN>/admin/` (or `http://localhost:${NGINX_PORT:-8080}/admin/` for the inner Nginx)
 
 ## 4) Data layout
 
@@ -200,9 +202,13 @@ Admin panel URL: `http://localhost:${NGINX_PORT:-80}/admin/`
 - `/docs` -> 不在生产 Nginx 代理；仅开发阶段直连后端使用
 - other paths -> `nginx try_files` static-first, fallback to `renderer` (adapter-node)
 
-## 5) Outer reverse proxy (recommended)
+## 5) HTTPS（Caddy）
 
-内层 Nginx 监听 `NGINX_PORT`（默认 80），通常还需要一个最外层反代来处理 HTTPS 证书和域名。以下是推荐的 Nginx 配置示例：
+Compose 已内置 Caddy：内层 Nginx 监听本机 `NGINX_PORT`（默认 8080），Caddy 对外监听 80/443，
+并根据 `SITE_DOMAIN` 自动申请和续期 HTTPS 证书。Cloudflare 的加密模式可以使用 `Full (strict)`。
+
+如需使用已有的外部 Nginx/Caddy 反代，可以把 `NGINX_PORT` 改为外部反代能够访问的端口，
+并停用 Compose 中的 `caddy` 服务。外部反代示例：
 
 ```nginx
 server {

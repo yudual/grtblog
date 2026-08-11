@@ -19,6 +19,7 @@ import (
 	"github.com/grtsinry43/grtblog-v2/server/internal/app/sysconfig"
 	domainalbum "github.com/grtsinry43/grtblog-v2/server/internal/domain/album"
 	"github.com/grtsinry43/grtblog-v2/server/internal/domain/content"
+	domainproject "github.com/grtsinry43/grtblog-v2/server/internal/domain/project"
 	domainthinking "github.com/grtsinry43/grtblog-v2/server/internal/domain/thinking"
 )
 
@@ -110,6 +111,7 @@ type Service struct {
 	renderer     *htmlsnapshot.Service
 	contentRepo  content.Repository
 	albumRepo    domainalbum.Repository
+	projectRepo  domainproject.Repository
 	thinkingRepo domainthinking.ThinkingRepository
 	sysCfg       *sysconfig.Service
 	debounce     time.Duration
@@ -119,13 +121,14 @@ type Service struct {
 	lastBootstrap       *BootstrapReport
 }
 
-func NewService(redisClient *redis.Client, redisPrefix string, renderer *htmlsnapshot.Service, contentRepo content.Repository, albumRepo domainalbum.Repository, thinkingRepo domainthinking.ThinkingRepository, sysCfg *sysconfig.Service) *Service {
+func NewService(redisClient *redis.Client, redisPrefix string, renderer *htmlsnapshot.Service, contentRepo content.Repository, albumRepo domainalbum.Repository, projectRepo domainproject.Repository, thinkingRepo domainthinking.ThinkingRepository, sysCfg *sysconfig.Service) *Service {
 	return &Service{
 		redis:        redisClient,
 		redisPrefix:  redisPrefix,
 		renderer:     renderer,
 		contentRepo:  contentRepo,
 		albumRepo:    albumRepo,
+		projectRepo:  projectRepo,
 		thinkingRepo: thinkingRepo,
 		sysCfg:       sysCfg,
 		debounce:     defaultDebounce,
@@ -276,11 +279,12 @@ func (s *Service) DiscoverRoutes(ctx context.Context) ([]string, error) {
 		"/friends",
 		"/friends-timeline",
 		"/moments",
+		"/projects",
 		"/tags",
 		"/thinkings",
 		"/timeline",
 	}
-	if s.contentRepo == nil && s.albumRepo == nil && s.thinkingRepo == nil {
+	if s.contentRepo == nil && s.albumRepo == nil && s.projectRepo == nil && s.thinkingRepo == nil {
 		return normalizeURLs(routes), nil
 	}
 
@@ -351,6 +355,14 @@ func (s *Service) DiscoverRoutes(ctx context.Context) ([]string, error) {
 			}
 			routes = append(routes, fmt.Sprintf("/albums/page/%d", page))
 		}
+	}
+
+	if s.projectRepo != nil {
+		projectRoutes, err := s.discoverProjectRoutes(ctx)
+		if err != nil {
+			return nil, err
+		}
+		routes = append(routes, projectRoutes...)
 	}
 
 	for p := 1; p <= defaultTrackedPages; p++ {
@@ -714,6 +726,25 @@ func (s *Service) discoverAlbumRoutes(ctx context.Context) ([]string, int64, err
 		totalPages = (total + 20 - 1) / 20
 	}
 	return paths, totalPages, nil
+}
+
+func (s *Service) discoverProjectRoutes(ctx context.Context) ([]string, error) {
+	if s.projectRepo == nil {
+		return nil, nil
+	}
+	shortURLs, err := s.projectRepo.ListPublishedProjectShortURLs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	paths := make([]string, 0, len(shortURLs))
+	for _, shortURL := range shortURLs {
+		shortURL = strings.TrimSpace(shortURL)
+		if shortURL == "" {
+			continue
+		}
+		paths = append(paths, fmt.Sprintf("/projects/%s", shortURL))
+	}
+	return paths, nil
 }
 
 func (s *Service) discoverCategoryRoutes(ctx context.Context) ([]string, error) {

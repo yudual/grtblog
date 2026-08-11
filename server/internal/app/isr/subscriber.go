@@ -12,6 +12,7 @@ import (
 	"github.com/grtsinry43/grtblog-v2/server/internal/app/federation"
 	"github.com/grtsinry43/grtblog-v2/server/internal/app/moment"
 	"github.com/grtsinry43/grtblog-v2/server/internal/app/page"
+	appproject "github.com/grtsinry43/grtblog-v2/server/internal/app/project"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -247,6 +248,54 @@ func RegisterAlbumSubscribers(bus appEvent.Bus, service *Service) {
 	register(appalbum.AlbumPublished{}.Name())
 	register(appalbum.AlbumUnpublished{}.Name())
 	register(appalbum.AlbumDeleted{}.Name())
+}
+
+func RegisterProjectSubscribers(bus appEvent.Bus, service *Service) {
+	if bus == nil || service == nil {
+		return
+	}
+
+	register := func(eventName string) {
+		bus.Subscribe(eventName, handlerFunc(func(ctx context.Context, event appEvent.Event) error {
+			projectID, shortURL := extractProjectEventPayload(event)
+			if projectID <= 0 {
+				return nil
+			}
+
+			deps := []string{
+				"project:list",
+				fmt.Sprintf("project:detail:%s", shortURL),
+			}
+			urls := []string{"/projects"}
+			if shortURL != "" {
+				urls = append(urls, fmt.Sprintf("/projects/%s", shortURL))
+			}
+			return service.Invalidate(ctx, deps, urls)
+		}))
+	}
+
+	register(appproject.ProjectCreated{}.Name())
+	register(appproject.ProjectUpdated{}.Name())
+	register(appproject.ProjectPublished{}.Name())
+	register(appproject.ProjectUnpublished{}.Name())
+	register(appproject.ProjectDeleted{}.Name())
+}
+
+func extractProjectEventPayload(event appEvent.Event) (projectID int64, shortURL string) {
+	switch e := event.(type) {
+	case appproject.ProjectCreated:
+		return e.ID, strings.TrimSpace(e.ShortURL)
+	case appproject.ProjectUpdated:
+		return e.ID, strings.TrimSpace(e.ShortURL)
+	case appproject.ProjectPublished:
+		return e.ID, strings.TrimSpace(e.ShortURL)
+	case appproject.ProjectUnpublished:
+		return e.ID, strings.TrimSpace(e.ShortURL)
+	case appproject.ProjectDeleted:
+		return e.ID, strings.TrimSpace(e.ShortURL)
+	default:
+		return 0, ""
+	}
 }
 
 func extractAlbumEventPayload(event appEvent.Event) (albumID int64, shortURL string) {

@@ -147,6 +147,7 @@ func Register(app *fiber.App, deps Dependencies) {
 
 	contentRepo := persistence.NewContentRepository(deps.DB)
 	albumRepo := persistence.NewAlbumRepository(deps.DB)
+	projectRepo := persistence.NewProjectRepository(deps.DB)
 	thinkingRepo := persistence.NewThinkingRepository(deps.DB)
 	ws.RegisterSiteActivitySubscriber(
 		eventBus,
@@ -163,7 +164,7 @@ func Register(app *fiber.App, deps Dependencies) {
 	deps.HTMLSnapshot = htmlSnapshotSvc
 	isrSvc := deps.ISR
 	if isrSvc == nil {
-		isrSvc = isr.NewService(deps.Redis, deps.Config.Redis.Prefix, htmlSnapshotSvc, contentRepo, albumRepo, thinkingRepo, sysCfgSvc)
+		isrSvc = isr.NewService(deps.Redis, deps.Config.Redis.Prefix, htmlSnapshotSvc, contentRepo, albumRepo, projectRepo, thinkingRepo, sysCfgSvc)
 	}
 	deps.ISR = isrSvc
 	isr.RegisterArticleSubscribers(eventBus, isrSvc)
@@ -171,6 +172,7 @@ func Register(app *fiber.App, deps Dependencies) {
 	isr.RegisterPageSubscribers(eventBus, isrSvc)
 	isr.RegisterThinkingSubscribers(eventBus, isrSvc)
 	isr.RegisterAlbumSubscribers(eventBus, isrSvc)
+	isr.RegisterProjectSubscribers(eventBus, isrSvc)
 	isr.RegisterFriendLinkSubscribers(eventBus, isrSvc)
 	isr.RegisterFriendTimelineSubscribers(eventBus, isrSvc)
 	isr.RegisterLayoutSubscribers(eventBus, isrSvc)
@@ -234,6 +236,7 @@ func Register(app *fiber.App, deps Dependencies) {
 	registerArticlePublicRoutes(v2, deps)
 	registerMomentPublicRoutes(v2, deps)
 	registerAlbumPublicRoutes(v2, deps)
+	registerProjectPublicRoutes(v2, deps)
 	registerThinkingPublicRoutes(v2, deps)
 	registerPagePublicRoutes(v2, deps)
 	registerTaxonomyPublicRoutes(v2, deps)
@@ -242,6 +245,7 @@ func Register(app *fiber.App, deps Dependencies) {
 	registerArticleAuthRoutes(v2, deps)
 	registerMomentAuthRoutes(v2, deps)
 	registerAlbumAuthRoutes(v2, deps)
+	registerProjectAuthRoutes(v2, deps)
 	registerThinkingAuthRoutes(v2, deps)
 	registerPageAuthRoutes(v2, deps)
 	registerCommentAuthRoutes(v2, deps)

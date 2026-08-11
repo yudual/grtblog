@@ -268,6 +268,56 @@ export const routeRecordRaw: MenuMixedOptions[] = [
     ],
   },
   {
+    path: 'projects',
+    name: 'projectManagement',
+    icon: 'iconify ph--folder',
+    label: '项目管理',
+    redirect: 'projects/list',
+    children: [
+      {
+        path: 'list',
+        name: 'projectList',
+        label: '项目列表',
+        icon: 'iconify ph--folder-open',
+        meta: {
+          componentName: 'ProjectList',
+          showTab: true,
+        },
+        component: 'projects/index',
+      },
+      {
+        path: 'edit/new',
+        name: 'projectCreate',
+        label: '新建项目',
+        icon: 'iconify ph--pencil-simple-line',
+        meta: {
+          componentName: 'ProjectEdit',
+          showTab: true,
+          enableMultiTab: true,
+          renderTabTitle() {
+            return '新建项目'
+          },
+        },
+        component: 'projects/edit',
+      },
+      {
+        path: 'edit/:id',
+        name: 'projectEdit',
+        label: '编辑项目',
+        show: false,
+        meta: {
+          componentName: 'ProjectEdit',
+          showTab: true,
+          enableMultiTab: true,
+          renderTabTitle({ id }) {
+            return `编辑项目${id ? `-${id}` : ''}`
+          },
+        },
+        component: 'projects/edit',
+      },
+    ],
+  },
+  {
     path: 'comments',
     name: 'commentManagement',
     icon: 'iconify ph--chat-circle-text',
@@ -518,6 +568,7 @@ export const routeRecordRaw: MenuMixedOptions[] = [
     name: 'pluginManagement',
     icon: 'iconify ph--puzzle-piece',
     label: '插件与云函数',
+    show: false,
     redirect: 'plugins/list',
     children: [
       {
@@ -525,6 +576,7 @@ export const routeRecordRaw: MenuMixedOptions[] = [
         name: 'pluginList',
         label: '插件与云函数',
         icon: 'iconify ph--puzzle-piece',
+        show: false,
         meta: {
           componentName: 'PluginList',
           showTab: true,

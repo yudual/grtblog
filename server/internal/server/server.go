@@ -94,6 +94,7 @@ func NewWithOptions(cfg config.Config, db *gorm.DB, opts Options) *Server {
 	sysCfgSvc := sysconfig.NewService(sysCfgRepo, cfg.Turnstile, eventBus)
 	contentRepo := persistence.NewContentRepository(db)
 	albumRepo := persistence.NewAlbumRepository(db)
+	projectRepo := persistence.NewProjectRepository(db)
 	thinkingRepo := persistence.NewThinkingRepository(db)
 	commentRepo := persistence.NewCommentRepository(db)
 	articleSvc := article.NewService(contentRepo, commentRepo, eventBus)
@@ -240,7 +241,7 @@ func NewWithOptions(cfg config.Config, db *gorm.DB, opts Options) *Server {
 	turnstileClient := turnstile.NewClient(cfg.Turnstile)
 	analyticsSvc := analytics.NewService(cfg, db, redisClient)
 	htmlSnapshotSvc := htmlsnapshot.NewService(contentRepo, cfg.App.HTMLSnapshotBaseURL, redisClient, cfg.Redis.Prefix)
-	isrSvc := isr.NewService(redisClient, cfg.Redis.Prefix, htmlSnapshotSvc, contentRepo, albumRepo, thinkingRepo, sysCfgSvc)
+	isrSvc := isr.NewService(redisClient, cfg.Redis.Prefix, htmlSnapshotSvc, contentRepo, albumRepo, projectRepo, thinkingRepo, sysCfgSvc)
 	httpStats := metrics.NewHTTPStats(6 * time.Hour)
 	fedHTTPClient := opts.FederationHTTPClient
 	if fedHTTPClient == nil {

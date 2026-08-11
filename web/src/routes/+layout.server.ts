@@ -31,10 +31,38 @@ const hasMenuPath = (items: NavMenuItem[], path: string): boolean =>
 			(item.children ? hasMenuPath(item.children, path) : false)
 	);
 
-const ensureProjectMenu = (items: NavMenuItem[]): NavMenuItem[] =>
-	hasMenuPath(items, '/projects')
-		? items
-		: [...items, { id: 1001, name: '项目', url: '/projects', icon: 'folder' }];
+const ensureProjectMenu = (items: NavMenuItem[]): NavMenuItem[] => {
+	const projectIndex = items.findIndex((item) => normalizeMenuPath(item.url) === '/projects');
+	const timelineIndex = items.findIndex((item) => normalizeMenuPath(item.url) === '/timeline');
+
+	let nextItems = items;
+	if (projectIndex < 0) {
+		const projectMenu: NavMenuItem = {
+			id: 1001,
+			name: '项目',
+			url: '/projects',
+			icon: 'folder'
+		};
+		nextItems =
+			timelineIndex >= 0
+				? [
+						...items.slice(0, timelineIndex),
+						projectMenu,
+						...items.slice(timelineIndex)
+					]
+				: [...items, projectMenu];
+	} else if (timelineIndex >= 0 && projectIndex > timelineIndex) {
+		const projectMenu = items[projectIndex];
+		nextItems = [
+			...items.slice(0, projectIndex),
+			...items.slice(projectIndex + 1, timelineIndex + 1),
+			projectMenu,
+			...items.slice(timelineIndex + 1)
+		];
+	}
+
+	return nextItems;
+};
 
 function resolveInternalBaseURL(): string {
 	if (typeof process === 'undefined' || !process.env) return defaultInternalBaseURL;
@@ -56,8 +84,8 @@ export const load: LayoutServerLoad = async (event) => {
 		{ id: 1, name: '首页', url: '/', icon: 'house' },
 		{ id: 2, name: '文章', url: '/posts', icon: 'book-open' },
 		{ id: 3, name: '手记', url: '/moments', icon: 'feather' },
-		{ id: 4, name: '时间线', url: '/timeline', icon: 'clock' },
-		{ id: 5, name: '项目', url: '/projects', icon: 'folder' }
+		{ id: 4, name: '项目', url: '/projects', icon: 'folder' },
+		{ id: 5, name: '时间线', url: '/timeline', icon: 'clock' }
 	];
 
 	const defaultSiteInfo: WebsiteInfoMap = {

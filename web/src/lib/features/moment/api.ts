@@ -29,6 +29,27 @@ const fallbackMoment: MomentSummary = {
 	updatedAt: '2026-08-02T14:00:00Z'
 };
 
+const fallbackMomentDetail: MomentDetail = {
+	...fallbackMoment,
+	content: `今天开始动手搭建全新的个人网站。
+
+这是一次从页面结构、内容组织到后台管理的重新整理，希望以后可以把文章、手记和做过的事情都好好记录下来。
+
+## 新的开始
+
+先把基础页面和内容流转起来，再慢慢补充真实的文章与项目记录。`,
+	contentHash: 'fallback-new-site-journal-v1',
+	authorId: 0,
+	isPublished: true,
+	topics: [],
+	metrics: {
+		views: 0,
+		likes: 0,
+		comments: 0
+	},
+	relatedPosts: []
+};
+
 export const getMomentList = async (
 	fetcher?: typeof fetch,
 	{ page = 1, pageSize = 10 }: MomentListOptions = {}
@@ -70,7 +91,10 @@ export const getMomentDetail = async (
 	shortUrl: string
 ): Promise<MomentDetail | null> => {
 	const api = getApi(fetcher);
-	return fetchOrNull(() => api<MomentDetail>(`/moments/short/${shortUrl}`));
+	const result = await fetchOrNull(() =>
+		api<MomentDetail>(`/moments/short/${encodeURIComponent(shortUrl)}`)
+	);
+	return result ?? (shortUrl === fallbackMomentDetail.shortUrl ? fallbackMomentDetail : null);
 };
 
 export const checkMomentLatest = async (
