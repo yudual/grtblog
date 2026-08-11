@@ -22,7 +22,7 @@ Update at least these values in `.env`:
 
 ### Using prebuilt images from GHCR (recommended)
 
-Every tagged release triggers a GitHub Actions workflow that builds multi-arch (`linux/amd64` + `linux/arm64`) images.
+Every push to `main` and every tagged release triggers a GitHub Actions workflow that builds multi-arch (`linux/amd64` + `linux/arm64`) images. Main-branch images use the `main` tag and the full 40-character commit SHA, so ARM VPS deployments should use the exact commit SHA.
 
 - `stable` tags push to `ghcr.io/yudual/`, Docker Hub, and CNB
 - `preview` tags push to `ghcr.io/yudual/` and CNB
